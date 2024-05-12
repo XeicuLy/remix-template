@@ -1,17 +1,22 @@
 import globals from "globals";
 import eslint from "@eslint/js";
+import tsEslint from "typescript-eslint";
 import tsParser from "@typescript-eslint/parser";
+import pluginReact from "eslint-plugin-react";
+import eslintConfigPrettier from "eslint-config-prettier";
 
 /**
  * @type {import('eslint').Linter.FlatConfig[]}
  */
-export default [
+export default tsEslint.config(
   {
     ignores: ["node_modules", ".cache", "build", "public/build", ".env"],
   },
   // 全体の設定
+  eslint.configs.recommended,
+  ...tsEslint.configs.recommended,
+  eslintConfigPrettier,
   {
-    ...eslint.configs.recommended,
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
@@ -31,6 +36,10 @@ export default [
   // Reactの設定
   {
     files: ["**/*.{js,jsx,ts,tsx}"],
+    plugins: {
+      react: pluginReact,
+    },
+    rules: {},
   },
   // TypeScriptの設定
   {
@@ -41,5 +50,5 @@ export default [
         project: "./tsconfig.json",
       },
     },
-  },
-];
+  }
+);
