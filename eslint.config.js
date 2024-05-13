@@ -1,3 +1,4 @@
+import { FlatCompat } from "@eslint/eslintrc";
 import globals from "globals";
 import eslint from "@eslint/js";
 import tsEslint from "typescript-eslint";
@@ -5,8 +6,11 @@ import tsParser from "@typescript-eslint/parser";
 import reactPlugin from "eslint-plugin-react";
 import reactJSXRuntime from "eslint-plugin-react/configs/jsx-runtime.js";
 import reactRecommended from "eslint-plugin-react/configs/recommended.js";
+import reactHooksPlugin from "eslint-plugin-react-hooks";
 import jsxA11yPlugin from "eslint-plugin-jsx-a11y";
 import eslintConfigPrettier from "eslint-config-prettier";
+
+const compat = new FlatCompat();
 
 /**
  * @type {import('eslint').Linter.FlatConfig[]}
@@ -48,7 +52,10 @@ export default tsEslint.config(
       ...reactJSXRuntime.languageOptions,
     },
     rules: {},
-    extends: [],
+    extends: [
+      ...compat.config(reactHooksPlugin.configs.recommended),
+      ...compat.config(jsxA11yPlugin.configs.recommended),
+    ],
     settings: {
       react: {
         version: "detect",
