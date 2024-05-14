@@ -1,14 +1,15 @@
 import { FlatCompat } from "@eslint/eslintrc";
-import globals from "globals";
 import eslint from "@eslint/js";
-import tsEslint from "typescript-eslint";
 import tsParser from "@typescript-eslint/parser";
+import eslintConfigPrettier from "eslint-config-prettier";
+import importPlugin from "eslint-plugin-import";
+import jsxA11yPlugin from "eslint-plugin-jsx-a11y";
 import reactPlugin from "eslint-plugin-react";
 import reactJSXRuntime from "eslint-plugin-react/configs/jsx-runtime.js";
 import reactRecommended from "eslint-plugin-react/configs/recommended.js";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
-import jsxA11yPlugin from "eslint-plugin-jsx-a11y";
-import eslintConfigPrettier from "eslint-config-prettier";
+import globals from "globals";
+import tsEslint from "typescript-eslint";
 
 const compat = new FlatCompat();
 
@@ -21,7 +22,7 @@ export default tsEslint.config(
   },
   // 全体の設定
   {
-    extends: [eslint.configs.recommended, ...tsEslint.configs.recommended],
+    extends: [eslint.configs.recommended],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
@@ -46,12 +47,41 @@ export default tsEslint.config(
     plugins: {
       react: reactPlugin,
       ["jsx-a11y"]: jsxA11yPlugin,
+      import: importPlugin,
     },
     languageOptions: {
       ...reactRecommended.languageOptions,
       ...reactJSXRuntime.languageOptions,
     },
-    rules: {},
+    rules: {
+      "import/order": [
+        "warn",
+        {
+          groups: [
+            "builtin",
+            "external",
+            "internal",
+            "parent",
+            "sibling",
+            "index",
+            "object",
+            "type",
+          ],
+          pathGroups: [
+            {
+              pattern: "@/**",
+              group: "parent",
+              position: "before",
+            },
+          ],
+          pathGroupsExcludedImportTypes: ["builtin"],
+          alphabetize: {
+            order: "asc",
+          },
+          "newlines-between": "never",
+        },
+      ],
+    },
     extends: [
       ...compat.config(reactHooksPlugin.configs.recommended),
       ...compat.config(jsxA11yPlugin.configs.recommended),
@@ -66,6 +96,9 @@ export default tsEslint.config(
         { name: "NavLink", linkAttribute: "to" },
       ],
       "import/resolver": {
+        node: {
+          extensions: [".js", ".jsx", ".ts", ".tsx"],
+        },
         typescript: {},
       },
     },
@@ -73,7 +106,8 @@ export default tsEslint.config(
   // TypeScriptの設定
   {
     files: ["**/*.{ts,tsx}"],
-    extends: [],
+    plugins: {},
+    extends: [...tsEslint.configs.recommended],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
