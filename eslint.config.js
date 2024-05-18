@@ -22,7 +22,8 @@ export default tsEslint.config(
   },
   // 全体の設定
   {
-    extends: [eslint.configs.recommended],
+    ...eslint.configs.recommended,
+    extends: [],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
@@ -53,6 +54,28 @@ export default tsEslint.config(
       ...reactRecommended.languageOptions,
       ...reactJSXRuntime.languageOptions,
     },
+
+    extends: [
+      ...compat.config(reactHooksPlugin.configs.recommended),
+      ...compat.config(jsxA11yPlugin.configs.recommended),
+    ],
+    settings: {
+      react: {
+        version: "detect",
+      },
+      formComponents: ["Form"],
+      linkComponents: [
+        { name: "Link", linkAttribute: "to" },
+        { name: "NavLink", linkAttribute: "to" },
+      ],
+      "import/internal-regex": "^@/",
+      "import/resolver": {
+        node: {
+          extensions: [".js", ".jsx", ".ts", ".tsx"],
+        },
+        typescript: {},
+      },
+    },
     rules: {
       "import/order": [
         "warn",
@@ -82,36 +105,28 @@ export default tsEslint.config(
         },
       ],
     },
-    extends: [
-      ...compat.config(reactHooksPlugin.configs.recommended),
-      ...compat.config(jsxA11yPlugin.configs.recommended),
-    ],
-    settings: {
-      react: {
-        version: "detect",
-      },
-      formComponents: ["Form"],
-      linkComponents: [
-        { name: "Link", linkAttribute: "to" },
-        { name: "NavLink", linkAttribute: "to" },
-      ],
-      "import/resolver": {
-        node: {
-          extensions: [".js", ".jsx", ".ts", ".tsx"],
-        },
-        typescript: {},
-      },
-    },
   },
   // TypeScriptの設定
   {
     files: ["**/*.{ts,tsx}"],
-    plugins: {},
+    plugins: {
+      import: importPlugin,
+    },
     extends: [...tsEslint.configs.recommended],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
         project: "./tsconfig.json",
+      },
+    },
+    settings: {
+      "import/resolver": {
+        node: {
+          extensions: [".ts", ".tsx"],
+        },
+        typescript: {
+          alwaysTryTypes: true,
+        },
       },
     },
   },
