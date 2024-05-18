@@ -8,6 +8,7 @@
     "dev": "remix vite:dev",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "remix-serve ./build/server/index.js",
+    "test": "vitest --ui",
     "typecheck": "tsc",
     "preinstall": "npx typesync || :",
     "prepare": "husky"
@@ -29,6 +30,7 @@
     "@eslint/eslintrc": "^3.0.2",
     "@eslint/js": "^9.2.0",
     "@remix-run/dev": "^2.9.2",
+    "@testing-library/react": "^15.0.7",
     "@types/eslint": "~8.56.10",
     "@types/eslint-config-prettier": "~6.11.3",
     "@types/eslint__eslintrc": "~2.1.1",
@@ -38,6 +40,8 @@
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "@vitest/ui": "^1.6.0",
     "autoprefixer": "^10.4.19",
     "eslint": "^9.2.0",
     "eslint-config-prettier": "^9.1.0",
@@ -48,6 +52,7 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "globals": "^15.2.0",
     "husky": "^9.0.11",
+    "jsdom": "^24.0.0",
     "lint-staged": "^15.2.2",
     "postcss": "^8.4.38",
     "prettier": "^3.2.5",
@@ -57,7 +62,8 @@
     "typescript-eslint": "^7.8.0",
     "typesync": "^0.12.1",
     "vite": "^5.1.0",
-    "vite-tsconfig-paths": "^4.2.1"
+    "vite-tsconfig-paths": "^4.2.1",
+    "vitest": "^1.6.0"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": "npx eslint --fix",
