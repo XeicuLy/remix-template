@@ -9,7 +9,8 @@
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "remix-serve ./build/server/index.js",
     "test": "vitest",
-    "test:ui": "vitest --ui",
+    "test:ui": "vitest --ui --coverage",
+    "test:coverage": "vitest --coverage",
     "typecheck": "tsc",
     "preinstall": "npx typesync || :",
     "prepare": "husky"
@@ -45,6 +46,7 @@
     "@typescript-eslint/eslint-plugin": "^7.17.0",
     "@typescript-eslint/parser": "^7.17.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "@vitest/coverage-v8": "^2.0.4",
     "@vitest/ui": "^2.0.4",
     "autoprefixer": "^10.4.19",
     "commitizen": "^4.3.0",

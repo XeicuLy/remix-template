@@ -8,6 +8,10 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    coverage: {
+      provider: 'v8',
+    },
+    include: ['**/unit/**/*.{test,spec}.?(c|m)[jt]s?(x)', '**/integration/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
   },
   resolve: {
     alias: {
