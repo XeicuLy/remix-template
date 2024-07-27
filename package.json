@@ -8,7 +8,8 @@
     "dev": "remix vite:dev",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "remix-serve ./build/server/index.js",
-    "test": "vitest --ui",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
     "typecheck": "tsc",
     "preinstall": "npx typesync || :",
     "prepare": "husky"

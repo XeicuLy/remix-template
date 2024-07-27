@@ -1,11 +1,20 @@
-import { Link } from '@remix-run/react';
-import type { MetaFunction } from '@remix-run/node';
+import { Link, useLoaderData } from '@remix-run/react';
+import type { LoaderFunction, MetaFunction } from '@remix-run/node';
 
 export const meta: MetaFunction = () => {
   return [{ title: 'New Remix App' }, { name: 'description', content: 'Welcome to Remix!' }];
 };
 
+export const loader: LoaderFunction = async () => {
+  const response = await fetch('https://jsonplaceholder.typicode.com/posts');
+  const data = await response.json();
+  return data;
+};
+
 export default function Index() {
+  const data = useLoaderData<typeof loader>();
+  console.log(data);
+
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif', lineHeight: '1.8' }}>
       <h1 className='text-3xl font-bold underline'>Welcome to Remix</h1>
