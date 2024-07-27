@@ -1,319 +1,102 @@
 ## ディレクトリ構成
 
-```sh
-./app
-├── .server     # Remix Viteでは.serverディレクトリのみサポートしている
-│  ├── actions # action用のコードを配置するディレクトリ
-│  │  ├── index.ts
-│  │  ├── ...色々なaction
-│  │  └── indexAction
-│  │     ├── index.ts
-│  │     └── index.spec.ts
-│  └── loaders # loader用のコードを配置するディレクトリ
-│     ├── index.ts
-│     ├── ...色々なloaderファイル
-│     ├── indexLoader
-│     │  ├── index.ts
-│     │  └── index.spec.ts
-│     └── rootLoader
-│        ├── index.ts
-│        └── index.spec.ts
+```
+app/
+├── components/            # 共通コンポーネント (Presentation Layer)
+│   ├── layout/            # レイアウトコンポーネント (header, footer)
+│   │   ├── Header.tsx     # ヘッダーコンポーネント
+│   │   └── Footer.tsx     # フッターコンポーネント
+│   └── ui/                # 純粋なUIコンポーネント (button, modal)
+│       ├── Button.tsx     # ボタンコンポーネント
+│       └── Modal.tsx      # モーダルコンポーネント
 │
-├── components  # Reactコンポーネントを配置するディレクトリ
-│  ├── ...色々なコンポーネント
-│  └── index.ts
+├── features/              # 各ページごとの機能 (Feature Element)
+│   ├── home/              # ホームページ固有の機能 (Feature Element)
+│   │   ├── api/           # ホームページ関連API呼び出し (Data Access Layer)
+│   │   │   └── fetchHomeData.server.ts # ホームページ固有のAPI呼び出し
+│   │   ├── components/    # ホームページ固有のコンポーネント (Presentation Layer)
+│   │   │   ├── HomeHeader.tsx          # ホームページのヘッダーコンポーネント
+│   │   │   └── HomeContent.tsx         # ホームページのコンテンツコンポーネント
+│   │   └── hooks/         # ホームページのカスタムフック (Business Logic Layer)
+│   │       └── useHomeData.ts          # ホームページ用のデータ取得フック
+│   │
+│   └── profile/           # プロフィールページ固有の機能 (Feature Element)
+│       ├── api/           # プロフィール関連API呼び出し (Data Access Layer)
+│       │   └── fetchProfileData.server.ts # プロフィールページ固有のAPI呼び出し
+│       ├── components/    # プロフィールページ固有のコンポーネント (Presentation Layer)
+│       │   ├── ProfileHeader.tsx       # プロフィールページのヘッダーコンポーネント
+│       │   └── ProfileContent.tsx      # プロフィールページのコンテンツコンポーネント
+│       └── hooks/         # プロフィールのカスタムフック (Business Logic Layer)
+│           └── useProfileData.ts       # プロフィール用のデータ取得フック
 │
-├── lib         # ライブラリに依存する関数を配置するディレクトリ
-│  ├── ...色々なライブラリに関する関数
-│  └── tailwind.ts
+├── hooks/                 # グローバルなカスタムフック (Business Logic Layer)
+│   ├── useAuth.ts         # 認証に関するカスタムフック
+│   └── useFetch.ts        # データフェッチに関するカスタムフック
 │
-├── entry.client.tsx
-├── entry.server.tsx
-├── root.tsx
+├── lib/                   # ライブラリに依存した関数 (Business Logic Layer)
+│   ├── apiClient.ts       # APIクライアントの設定
+│   └── dateUtils.ts       # 日付処理のユーティリティ関数
 │
-└── routes      # route用のコードを配置するディレクトリ
-    ├── ...色々なrouteファイル
-    └── _index.tsx
-
-./test
-├── lib         # テスト用のサーバーサイドコードを配置するディレクトリ
-│  └── tailwind.spec.ts # action用のテストコードを配置するディレクトリ
-└── components  # コンポーネントのテストコードを配置するディレクトリ
-    └── ColorText.spec.ts
-```
-
-## loaderとactionをどう書くか
-
-RemixのページはRouteファイルを作成します。Routeファイルには、サーバー側で実行されるコードとクライアント側で実行されるコードの両方が書けますが、とりわけサーバー側で実行されるloaderモジュールとactionモジュールは肥大化しがちです。
-
-そうなってくると、中の処理を関数に切り出したりするわけですが、それならば、そもそも両モジュールを別ファイルに書きたいよねとなってきます。
-
-そんなわけで、必然的にloaderモジュールとactionモジュールは別ファイルに書いて、Routeファイルからexportする構成になりました。
-
-Remixでは、サーバー側のコードは.serverモジュールという仕組みを使ってクライアントコードへの混入を防ぐ仕組みがあります。
-
-Remix Viteからは、サーバー.server ディレクトリのみサポートするということなので、サーバー側で実行するloaderとactionは .server ディレクトリ配下に作成した actions と loaders というディレクトリで管理します。
-
-actions と loaders ディレクトリの下には各Routeファイル用のモジュールを配置することで、各モジュールのテストコードも自然と同じ場所に置けるようになります。
-
-### loaderの書き方
-
-例えば、Routeファイル \_index.tsx で使うloaderモジュール（.server/loaders/indexLoader/index.ts）を次のように書いて作成します。
-
-```ts
-// .server/loaders/indexLoader/index.ts
-import type { LoaderFunctionArgs } from '@remix-run/node';
-
-export async function indexLoader({ request }: LoaderFunctionArgs) {
-  // 色々なコードを書く
-  return {
-    // 色々なものを返す
-  };
-}
-
-// loaderの戻り値の型も一緒に返しておくとuseLoaderDataで便利に使える
-export type indexLoader = typeof indexLoader;
-```
-
-あわせてテストコードを次のように書きます
-
-```ts
-// .server/loaders/indexLoader/index.spec.ts
-import { indexIndexLoader } from '.';
-import type { LoaderFunctionArgs } from '@remix-run/node';
-
-test('return valid data', async () => {
-  const loaderFunctionArgs: LoaderFunctionArgs = {
-    request: new Request('https://example.com', {
-      method: 'GET',
-    }),
-    params: {},
-    context: {},
-  };
-  const loaderData = await indexIndexLoader(loaderFunctionArgs);
-  const res = await loaderData.json();
-  expect(res).toEqual({
-    // loaderが返すデータ
-  });
-});
-```
-
-最後に .server/loaders/index.ts からexportしておきます。
-
-```ts
-// .server/loaders/index.ts
-export * from './indexLoader';
-```
-
-このようにして作成したloaderモジュールは、Routeファイル \_index.tsx で次のようにして利用します。
-
-```tsx
-// routes/_index.tsx
-import { useLoaderData } from "@remix-run/react";
-import type { IndexIndexLoader } from "~/.server/loaders";
-// Routeファイルからas loaderとしてexportすれば、loaderモジュールとして機能する
-export { indexIndexLoader as loader } from "~/.server/loaders";
-
-export default function Index() {
-  // IndexIndexLoaderを指定することで、dataに型情報がつく
-  const data = useLoaderData<IndexIndexLoader>();
-  return (
-    // クライアントコンポーネントでdataを利用する
-  )
-}
-```
-
-### actionの書き方
-
-例えば、Routeファイル \_index.tsx で使うactionモジュール（.server/actions/indexAction/index.ts）を次のように書いて作成します。
-
-```ts
-// .server/actions/indexAction/index.ts
-import type { ActionFunctionArgs } from '@remix-run/node';
-
-export async function indexAction({ request }: ActionFunctionArgs) {
-  // 色々なコードを書く
-  return {
-    // 色々なものを返す
-  };
-}
-
-// actionの戻り値の型も一緒に返しておくとuseActionDataで便利に使える
-export type IndexIndexAction = typeof indexAction;
-```
-
-あわせてテストコードを次のように書きます
-
-```ts
-// .server/actions/indexAction/index.spec.ts
-import { indexIndexAction } from '.';
-import type { ActionFunctionArgs } from '@remix-run/node';
-
-test('return valid data', async () => {
-  const actionFunctionArgs: ActionFunctionArgs = {
-    request: new Request('https://example.com', {
-      method: 'GET',
-    }),
-    params: {},
-    context: {},
-  };
-  const actionData = await indexIndexAction(actionFunctionArgs);
-  const res = await actionData.json();
-  expect(res).toEqual({
-    // actionが返すデータ
-  });
-});
-```
-
-最後に .server/actions/index.ts からexportしておきます。
-
-```ts
-// .server/actions/index.ts
-export * from './indexAction';
-```
-
-このようにして作成したactionモジュールは、Routeファイル \_index.tsx で次のようにして利用します。
-
-```tsx
-// routes/_index.tsx
-import { useActionData } from "@remix-run/react";
-import type { IndexIndexAction } from "~/.server/actions";
-// Routeファイルからas actionとしてexportすれば、actionモジュールとして機能する
-export { indexIndexAction as action } from "~/.server/actions";
-
-export default function Index() {
-  // IndexIndexActionを指定することで、dataに型情報がつく
-  const data = useActionData<IndexIndexAction>();
-  return (
-    // クライアントコンポーネントでdataを利用する
-  )
-}
-```
-
-## ライブラリに依存する関数をどう書くか
-
-ライブラリに依存する関数は、libディレクトリに配置します。
-
-例えば、tailwindcssの色を指定する関数を作成する場合、次のようにして作成します。
-
-```ts
-// lib/tailwind.ts
-export function color(colorName: string) {
-  switch (colorName) {
-    case 'red':
-      return 'text-red-500';
-    case 'blue':
-      return 'text-blue-500';
-    default:
-      return 'text-black';
-  }
-}
-```
-
-このようにして作成した関数は、コンポーネントで次のようにして利用します。
-
-```tsx
-// components/ColorText.tsx
-import { color } from '~/lib/tailwind';
-
-export default function ColorText({ colorName }: { colorName: string }) {
-  return <span className={color(colorName)}>Hello, world!</span>;
-}
-```
-
-## コンポーネントをどう書くか
-
-コンポーネントは、componentsディレクトリに配置します。
-
-例えば、ColorTextコンポーネントを作成する場合、次のようにして作成します。
-
-```tsx
-// components/ColorText.tsx
-import { color } from '~/lib/tailwind';
-
-export default function ColorText({ colorName }: { colorName: string }) {
-  return <span className={color(colorName)}>Hello, world!</span>;
-}
-```
-
-このようにして作成したコンポーネントは、Routeファイル \_index.tsx で次のようにして利用します。
-
-```tsx
-// routes/_index.tsx
-import ColorText from '~/components/ColorText';
-
-export default function Index() {
-  return (
-    <div>
-      <ColorText colorName='red' />
-    </div>
-  );
-}
-```
-
-## ルートファイルをどう書くか
-
-ルートファイルは、routesディレクトリに配置します。
-
-例えば、indexルートファイルを作成する場合、次のようにして作成します。
-
-```tsx
-// routes/_index.tsx
-import { useLoaderData } from '@remix-run/react';
-import type { IndexIndexLoader } from '~/.server/loaders';
-import type { IndexIndexAction } from '~/.server/actions';
-import ColorText from '~/components/ColorText';
-
-export { indexIndexLoader as loader } from '~/.server/loaders';
-export { indexIndexAction as action } from '~/.server/actions';
-
-export default function Index() {
-  const loaderData = useLoaderData<IndexIndexLoader>();
-  const actionData = useActionData<IndexIndexAction>();
-  return (
-    <div>
-      <ColorText colorName='red' />
-    </div>
-  );
-}
-```
-
-## エントリーポイントをどう書くか
-
-エントリーポイントは、entry.client.tsx と entry.server.tsx に分けて配置します。
-
-例えば、entry.client.tsx と entry.server.tsx を次のようにして作成します。
-
-```tsx
-// entry.client.tsx
-import React from 'react';
-import { RemixBrowser } from '@remix-run/react/browser';
-
-export default function App() {
-  return (
-    <RemixBrowser>
-      <div>
-        <h1>Hello, world!</h1>
-      </div>
-    </RemixBrowser>
-  );
-}
-```
-
-```tsx
-// entry.server.tsx
-import React from 'react';
-import { RemixServer } from '@remix-run/react/server';
-
-export default function App() {
-  return (
-    <RemixServer>
-      <div>
-        <h1>Hello, world!</h1>
-      </div>
-    </RemixServer>
-  );
-}
+├── routes/                # Remixのルートファイル
+│   ├── index.tsx          # ルートページファイル
+│   ├── home.tsx           # ホームページのルートファイル
+│   ├── profile.tsx        # プロフィールページのルートファイル
+│   └── api/               # グローバルなAPIエンドポイント
+│        └── sample.server.ts # サンプルAPIエンドポイント
+│
+├── store/                 # 状態管理 (Business Logic Layer)
+│   └── userStore.ts       # ユーザー情報の状態管理
+│
+├── styles/                # 共通スタイル (Presentation Layer)
+│   ├── globals.css        # グローバルスタイル
+│   ├── tailwind.css       # Tailwind CSSのスタイル
+│   ├── variables.css      # CSS変数
+│   └── mixins.css         # ミックスイン
+│
+├── test/                  # テストファイルディレクトリ
+│   ├── e2e/               # エンドツーエンドテスト
+│   │   ├── home.e2e.test.ts       # ホームページのE2Eテスト
+│   │   └── profile.e2e.test.ts    # プロフィールページのE2Eテスト
+│   │
+│   ├── integration/       # 統合テスト
+│   │   ├── home.integration.test.ts       # ホームページの統合テスト
+│   │   └── profile.integration.test.ts    # プロフィールページの統合テスト
+│   │
+│   └── unit/              # ユニットテスト
+│       ├── api.test.ts    # グローバルなAPI通信ロジックのユニットテスト
+│       ├── components/    # 共通コンポーネントのユニットテスト
+│       │   ├── Header.test.ts    # ヘッダーコンポーネントのユニットテスト
+│       │   ├── Footer.test.ts    # フッターコンポーネントのユニットテスト
+│       │   ├── Button.test.ts    # ボタンコンポーネントのユニットテスト
+│       │   └── Modal.test.ts     # モーダルコンポーネントのユニットテスト
+│       ├── features/      # 各ページごとの機能のユニットテスト
+│       │   ├── home/      # ホームページのユニットテスト
+│       │   │   ├── api/   # ホームページ関連API呼び出しのユニットテスト
+│       │   │   │   └── homeApi.test.ts
+│       │   │   ├── components/    # ホームページ固有のコンポーネントのユニットテスト
+│       │   │   │   └── homeComponent.test.ts
+│       │   │   └── hooks/         # ホームページのカスタムフックのユニットテスト
+│       │   │       └── homeHook.test.ts
+│       │   └── profile/  # プロフィールページのユニットテスト
+│       │       ├── api/  # プロフィール関連API呼び出しのユニットテスト
+│       │       │   └── profileApi.test.ts
+│       │       ├── components/    # プロフィールページ固有のコンポーネントのユニットテスト
+│       │       │   └── profileComponent.test.ts
+│       │       └── hooks/         # プロフィールのカスタムフックのユニットテスト
+│       │           └── profileHook.test.ts
+│       ├── hooks/         # グローバルなカスタムフックのユニットテスト
+│       │   ├── useAuth.test.ts   # 認証に関するカスタムフックのユニットテスト
+│       │   └── useFetch.test.ts  # データフェッチに関するカスタムフックのユニットテスト
+│       ├── lib.test.ts    # ライブラリに依存した関数のユニットテスト
+│       ├── store.test.ts  # 状態管理のユニットテスト
+│       └── utils.test.ts  # ユーティリティ関数のユニットテスト
+│
+├── types/                 # グローバルな型定義ファイル
+│   └── index.d.ts         # 型定義のエントリーポイント
+│
+└── utils/                 # ユーティリティ関数 (Business Logic Layer)
+    ├── format.ts          # 文字列フォーマットに関するユーティリティ
+    └── math.ts            # 数値計算に関するユーティリティ
 ```
 
 ## Welcome to Remix + Vite!
