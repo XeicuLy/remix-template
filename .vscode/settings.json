@@ -1,13 +1,13 @@
 {
-	"editor.formatOnSave": true,
-	"editor.codeActionsOnSave": {
-		"source.fixAll": "explicit",
-		"source.organizeImports.biome": "explicit",
-		"quickfix.biome": "explicit"
-	},
-	"editor.defaultFormatter": "biomejs.biome",
-	"notebook.defaultFormatter": "biomejs.biome",
-	"files.associations": {
-		"*.css": "tailwindcss"
-	}
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports.biome": "explicit",
+    "quickfix.biome": "explicit"
+  },
+  "editor.defaultFormatter": "biomejs.biome",
+  "notebook.defaultFormatter": "biomejs.biome",
+  "files.associations": {
+    "*.css": "tailwindcss"
+  }
 }
