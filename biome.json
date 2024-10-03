@@ -3,14 +3,15 @@
 	"vcs": {
 		"enabled": false,
 		"clientKind": "git",
-		"useIgnoreFile": false
+		"useIgnoreFile": true
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"ignore": []
+		"ignore": ["node_modules", ".cache", "build", ".env", "coverage"]
 	},
 	"formatter": {
 		"enabled": true,
+		"formatWithErrors": false,
 		"lineWidth": 120
 	},
 	"organizeImports": {
@@ -18,6 +19,7 @@
 	},
 	"linter": {
 		"enabled": true,
+		"ignore": ["!./.server", "!./.client"],
 		"rules": {
 			"recommended": true
 		}
