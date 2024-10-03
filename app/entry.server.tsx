@@ -20,7 +20,6 @@ export default function handleRequest(
   remixContext: EntryContext,
   // This is ignored so we can keep it in the template for visibility.  Feel
   // free to delete this parameter in your app if you're not using it!
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   loadContext: AppLoadContext,
 ) {
   return isbot(request.headers.get('user-agent') || '')
@@ -30,11 +29,11 @@ export default function handleRequest(
 
 function handleBotRequest(
   request: Request,
-  initialResponseStatusCode: number, // ローカル変数に変更
+  initialResponseStatusCode: number,
   responseHeaders: Headers,
   remixContext: EntryContext,
 ) {
-  let responseStatusCode = initialResponseStatusCode; // パラメータの代わりにローカル変数を使用
+  let responseStatusCode = initialResponseStatusCode;
   return new Promise((resolve, reject) => {
     let shellRendered = false;
     const { pipe, abort } = renderToPipeableStream(
