@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import { cn } from '@/lib/tailwind';
+import { describe, expect, it } from 'vitest';
 
 describe('app/lib/tailwind.ts', () => {
   it('偽値を無視する', () => {

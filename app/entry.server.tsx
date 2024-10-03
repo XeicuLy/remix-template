@@ -6,10 +6,10 @@
 
 import { PassThrough } from 'node:stream';
 import { createReadableStreamFromReadable } from '@remix-run/node';
+import type { AppLoadContext, EntryContext } from '@remix-run/node';
 import { RemixServer } from '@remix-run/react';
 import { isbot } from 'isbot';
 import { renderToPipeableStream } from 'react-dom/server';
-import type { AppLoadContext, EntryContext } from '@remix-run/node';
 
 const ABORT_DELAY = 5_000;
 
@@ -20,7 +20,6 @@ export default function handleRequest(
   remixContext: EntryContext,
   // This is ignored so we can keep it in the template for visibility.  Feel
   // free to delete this parameter in your app if you're not using it!
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   loadContext: AppLoadContext,
 ) {
   return isbot(request.headers.get('user-agent') || '')
@@ -30,10 +29,11 @@ export default function handleRequest(
 
 function handleBotRequest(
   request: Request,
-  responseStatusCode: number,
+  initialResponseStatusCode: number,
   responseHeaders: Headers,
   remixContext: EntryContext,
 ) {
+  let responseStatusCode = initialResponseStatusCode;
   return new Promise((resolve, reject) => {
     let shellRendered = false;
     const { pipe, abort } = renderToPipeableStream(
@@ -60,9 +60,6 @@ function handleBotRequest(
         },
         onError(error: unknown) {
           responseStatusCode = 500;
-          // Log streaming rendering errors from inside the shell.  Don't log
-          // errors encountered during initial shell rendering since they'll
-          // reject and get logged in handleDocumentRequest.
           if (shellRendered) {
             console.error(error);
           }
@@ -76,10 +73,11 @@ function handleBotRequest(
 
 function handleBrowserRequest(
   request: Request,
-  responseStatusCode: number,
+  initialResponseStatusCode: number,
   responseHeaders: Headers,
   remixContext: EntryContext,
 ) {
+  let responseStatusCode = initialResponseStatusCode;
   return new Promise((resolve, reject) => {
     let shellRendered = false;
     const { pipe, abort } = renderToPipeableStream(
@@ -106,9 +104,6 @@ function handleBrowserRequest(
         },
         onError(error: unknown) {
           responseStatusCode = 500;
-          // Log streaming rendering errors from inside the shell.  Don't log
-          // errors encountered during initial shell rendering since they'll
-          // reject and get logged in handleDocumentRequest.
           if (shellRendered) {
             console.error(error);
           }
