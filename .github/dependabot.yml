@@ -16,16 +16,11 @@ updates:
     commit-message:
       prefix: ':package: package(deps):'
       prefix-development: ':package: package(dev-deps):'
-      include: true
-      subject: '{{dependency.name}} update'
     open-pull-requests-limit: 5
     allow:
       - dependency-type: 'direct'
-        update-type: 'all'
       - dependency-type: 'all'
-        update-type: 'security'
     labels:
       - 'dependencies'
       - 'security'
       - 'dependabot'
-    automerge: false
