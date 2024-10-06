@@ -7,6 +7,7 @@
     "build": "remix vite:build",
     "dev": "remix vite:dev",
     "lint": "biome check --write",
+    "lint:ts": "tsc --noEmit",
     "format:yaml": "prettier --write \"**/*.{yaml,yml}\"",
     "start": "remix-serve ./build/server/index.js",
     "test": "vitest",
