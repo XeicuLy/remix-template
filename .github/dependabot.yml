@@ -18,9 +18,7 @@ updates:
       prefix-development: ':package: package(dev-deps):'
     open-pull-requests-limit: 5
     allow:
-      - dependency-type: 'direct'
       - dependency-type: 'all'
     labels:
       - 'dependencies'
-      - 'security'
       - 'dependabot'
