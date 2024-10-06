@@ -7,6 +7,7 @@
     "build": "remix vite:build",
     "dev": "remix vite:dev",
     "lint": "biome check --write",
+    "format:yaml": "prettier --write \"**/*.{yaml,yml}\"",
     "start": "remix-serve ./build/server/index.js",
     "test": "vitest",
     "test:ui": "vitest --ui --coverage",
@@ -68,7 +69,8 @@
     }
   },
   "lint-staged": {
-    "**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts,json,md}": "biome check --write"
+    "**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts,json,md}": "biome check --write",
+    "**/*.{yaml,yml}": "prettier --write"
   },
   "engines": {
     "node": ">=18.0.0"
