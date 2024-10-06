@@ -14,7 +14,7 @@ env:
   NODE_VERSION: 20.x
 
 jobs:
-  setup:
+  type-check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
@@ -34,17 +34,29 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-  type-check:
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
       - name: Run TypeScript type check
         run: pnpm run lint:ts
 
   test:
     runs-on: ubuntu-latest
-    needs: setup
     steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Set Node.js version to ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
       - name: Run Vitest and coverage
         run: pnpm test:coverage
         env:
@@ -52,7 +64,24 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    needs: [setup, type-check, test]
+    needs: [type-check, test]
     steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Set Node.js version to ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
       - name: Run Build
         run: pnpm build
