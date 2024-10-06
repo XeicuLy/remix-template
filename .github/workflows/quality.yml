@@ -12,6 +12,8 @@ on:
 
 env:
   NODE_VERSION: 20.17.0
+  PNPM_VERSION: 9
+  PACKAGE_MANAGER: pnpm
 
 jobs:
   type-check:
@@ -20,22 +22,22 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Install pnpm
+      - name: Install ${{ env.PACKAGE_MANAGER }}
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: ${{ env.PNPM_VERSION }}
 
       - name: Set Node.js version to ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: ${{ env.PACKAGE_MANAGER }}
 
       - name: Install dependencies
-        run: pnpm install
+        run: ${{ env.PACKAGE_MANAGER }} install
 
       - name: Run TypeScript type check
-        run: pnpm run lint:ts
+        run: ${{ env.PACKAGE_MANAGER }} run lint:ts
 
   test:
     runs-on: ubuntu-latest
@@ -43,22 +45,22 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Install pnpm
+      - name: Install ${{ env.PACKAGE_MANAGER }}
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: ${{ env.PNPM_VERSION }}
 
       - name: Set Node.js version to ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: ${{ env.PACKAGE_MANAGER }}
 
       - name: Install dependencies
-        run: pnpm install
+        run: ${{ env.PACKAGE_MANAGER }} install
 
       - name: Run Vitest and coverage
-        run: pnpm test:coverage
+        run: ${{ env.PACKAGE_MANAGER }} test:coverage
         env:
           CI: true
 
@@ -68,25 +70,25 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Install pnpm
+      - name: Install ${{ env.PACKAGE_MANAGER }}
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: ${{ env.PNPM_VERSION }}
 
       - name: Set Node.js version to ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: ${{ env.PACKAGE_MANAGER }}
 
       - name: Install dependencies
-        run: pnpm install
+        run: ${{ env.PACKAGE_MANAGER }} install
 
       - name: Run Biome check
-        run: pnpm lint
+        run: ${{ env.PACKAGE_MANAGER }} lint
 
       - name: Run Prettier check
-        run: pnpm format:yaml
+        run: ${{ env.PACKAGE_MANAGER }} format:yaml
 
   build:
     runs-on: ubuntu-latest
@@ -95,19 +97,19 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Install pnpm
+      - name: Install ${{ env.PACKAGE_MANAGER }}
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: ${{ env.PNPM_VERSION }}
 
       - name: Set Node.js version to ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: ${{ env.PACKAGE_MANAGER }}
 
       - name: Install dependencies
-        run: pnpm install
+        run: ${{ env.PACKAGE_MANAGER }} install
 
       - name: Run Build
-        run: pnpm build
+        run: ${{ env.PACKAGE_MANAGER }} build
