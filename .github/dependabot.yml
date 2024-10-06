@@ -5,7 +5,6 @@
 
 version: 2
 updates:
-  # 通常の依存関係のアップデート（毎週）
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
@@ -14,37 +13,18 @@ updates:
       time: '09:00'
       timezone: 'Asia/Tokyo'
     commit-message:
-      prefix: ':package: package:'
-      prefix-development: ':package: package:'
+      prefix: ':package: package(deps):'
+      prefix-development: ':package: package(dev-deps):'
       include: true
       subject: '{{dependency.name}} update'
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     allow:
       - dependency-type: 'direct'
-        update-type: 'version-update:semver-major'
-      - dependency-type: 'direct'
-        update-type: 'version-update:semver-minor'
-      - dependency-type: 'direct'
-        update-type: 'version-update:semver-patch'
-    labels:
-      - 'dependencies'
-    automerge: false
-
-  # セキュリティ更新（毎日）
-  - package-ecosystem: 'npm'
-    directory: '/'
-    schedule:
-      interval: 'daily'
-      time: '09:00'
-      timezone: 'Asia/Tokyo'
-    commit-message:
-      prefix: 'security:'
-      include: true
-      subject: '{{dependency.name}} security update'
-    open-pull-requests-limit: 10
-    allow:
+        update-type: 'all'
       - dependency-type: 'all'
         update-type: 'security'
     labels:
+      - 'dependencies'
       - 'security'
+      - 'dependabot'
     automerge: false
