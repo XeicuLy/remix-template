@@ -10,7 +10,7 @@
     "lint:fix": "biome check --write",
     "lint:ts": "tsc --noEmit",
     "format:yaml": "prettier \"**/*.{yaml,yml}\" !pnpm-lock.yaml",
-    "format:yaml:fix": "prettier --write \"**/*.{yaml,yml}\"",
+    "format:yaml:fix": "prettier --write \"**/*.{yaml,yml}\" !pnpm-lock.yaml",
     "start": "remix-serve ./build/server/index.js",
     "test": "vitest",
     "test:ui": "vitest --ui --coverage",
