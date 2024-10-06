@@ -11,6 +11,7 @@
     "lint:ts": "tsc --noEmit",
     "format:yaml": "prettier \"**/*.{yaml,yml}\"",
     "format:yaml:fix": "prettier --write \"**/*.{yaml,yml}\"",
+    "format:yaml:ci": "prettier \"**/*.{yaml,yml}\" --ignore-path .prettierignore",
     "start": "remix-serve ./build/server/index.js",
     "test": "vitest",
     "test:ui": "vitest --ui --coverage",

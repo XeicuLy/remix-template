@@ -88,7 +88,7 @@ jobs:
         run: ${{ env.PACKAGE_MANAGER }} lint
 
       - name: Run Prettier check
-        run: ${{ env.PACKAGE_MANAGER }} format:yaml
+        run: ${{ env.PACKAGE_MANAGER }} format:yaml:ci
 
   build:
     runs-on: ubuntu-latest
