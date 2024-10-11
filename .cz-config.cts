@@ -5,8 +5,8 @@ const config = {
       value: ':sparkles: feat',
     },
     {
-      name: 'pref:      ⚡️ パフォーマンス改善',
-      value: ':zap: pref',
+      name: 'perf:      ⚡️ パフォーマンス改善',
+      value: ':zap: perf',
     },
     {
       name: 'improve:   🎨 コードの構造/ロジックの改善',
@@ -17,16 +17,16 @@ const config = {
       value: ':wheelchair: a11y',
     },
     {
-      name: 'update:    🦺 バリデーションの追加/更新',
-      value: ':safety_vest: update',
-    },
-    {
       name: 'assets:    🍱 アセットの追加/更新',
       value: ':bento: assets',
     },
     {
-      name: 'fix:       🩹 軽微な修正',
-      value: ':adhesive_bandage: fix',
+      name: 'update:    🦺 バリデーションの追加/更新',
+      value: ':safety_vest: update',
+    },
+    {
+      name: 'update:    🩹 軽微な修正',
+      value: ':adhesive_bandage: update',
     },
     {
       name: 'fix:       🐛 バグ修正',
@@ -104,6 +104,7 @@ const config = {
     footer: '関連するチケットや課題があれば番号を入力してください（例: #123）:（enterでスキップ）\n',
     confirmCommit: '上記の内容でコミットを行いますか？(Y/n)\n',
   },
+  skipQuestions: ['scope'],
   subjectLimit: 100,
 };
 

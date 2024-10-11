@@ -8,7 +8,7 @@ const config = {
       'always',
       [
         'feat',
-        'pref',
+        'perf',
         'improve',
         'a11y',
         'update',
