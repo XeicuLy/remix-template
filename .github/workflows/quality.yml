@@ -1,6 +1,7 @@
 name: Quality Check
 
 on:
+  # プルリクエストが「main」または「develop」ブランチに対して開かれたり、追加でコミットされたときに実行
   pull_request:
     branches:
       - main
@@ -8,30 +9,40 @@ on:
     types:
       - opened
       - synchronize
+  # 手動でワークフローを実行する場合のトリガー
   workflow_dispatch:
 
 env:
+  # Node.js と pnpm のバージョン設定
   NODE_VERSION: 20.17.0
   PNPM_VERSION: 9
 
 jobs:
+  # TypeScript の型チェックを行うジョブ
   typecheck:
+    name: 'TypeScript Type Check'
     runs-on: ubuntu-latest
     steps:
+      # ソースコードをチェックアウト（GitHub Actions がリポジトリのコードを取得）
       - name: Checkout source code
         uses: actions/checkout@v4
 
+      # Node.js と依存関係をインストール
       - name: Setup Node.js and install dependencies
         uses: ./.github/actions/install
         with:
-          pnpm-version: ${{ env.PNPM_VERSION }}
-          node-version: ${{ env.NODE_VERSION }}
+          pnpm-version: ${{ env.PNPM_VERSION }} # 環境変数で設定した pnpm のバージョンを使用
+          node-version: ${{ env.NODE_VERSION }} # 環境変数で設定した Node.js のバージョンを使用
 
+      # TypeScript の型チェックを実行
       - name: Run TypeScript type check
         run: pnpm ci:typecheck
 
+  # ユニットテストを実行するジョブ
   test:
+    name: 'Run Unit Tests'
     runs-on: ubuntu-latest
+    needs: typecheck # TypeScript の型チェックが成功した後に実行
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
@@ -42,13 +53,17 @@ jobs:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
 
+      # Vitest を使ってユニットテストを実行し、カバレッジを取得
       - name: Run Vitest and coverage
         run: pnpm ci:test
         env:
-          CI: true
+          CI: true # CI 環境用に設定
 
+  # コードスタイルチェックを行うジョブ
   biome:
+    name: 'Biome Code Style Check'
     runs-on: ubuntu-latest
+    needs: typecheck # 型チェックが成功した後に実行
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
@@ -59,11 +74,15 @@ jobs:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
 
+      # Biome（コードフォーマット & スタイルチェックツール）を実行
       - name: Run Biome check
         run: pnpm ci:biome
 
+  # Prettier を使ってコードの整形を確認するジョブ
   prettier:
+    name: 'Prettier Formatting Check'
     runs-on: ubuntu-latest
+    needs: typecheck # 型チェックが成功した後に実行
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
@@ -74,12 +93,15 @@ jobs:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
 
+      # Prettier を使ってコードのフォーマットを確認
       - name: Run Prettier check
         run: pnpm ci:prettier
 
+  # プロジェクトのビルドを行うジョブ
   build:
+    name: 'Build the Project'
     runs-on: ubuntu-latest
-    needs: [typecheck, test, biome, prettier]
+    needs: [typecheck, test, biome, prettier] # 型チェック、テスト、コードスタイル、整形が成功した後に実行
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
@@ -90,5 +112,6 @@ jobs:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
 
+      # プロジェクトのビルドを実行
       - name: Run Build
         run: pnpm build
