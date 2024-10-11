@@ -100,10 +100,10 @@ const config = {
   messages: {
     type: 'コミットの種類（型）を選択してください:\n',
     subject: 'コミットメッセージを入力してください:\n',
-    body: '変更内容の詳細があれば書いてください:（enterでスキップ）\n',
-    confirmCommit: '上記のコミットを続行してもよろしいですか?(Y/n)\n',
+    body: '変更内容の詳細を入力してください:（enterでスキップ）\n',
+    footer: '関連するチケットや課題があれば番号を入力してください（例: #123）:（enterでスキップ）\n',
+    confirmCommit: '上記の内容でコミットを行いますか？(Y/n)\n',
   },
-  skipQuestions: ['scope', 'breaking', 'footer'],
   subjectLimit: 100,
 };
 
