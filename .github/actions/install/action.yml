@@ -2,14 +2,19 @@ name: 'Install'
 description: 'Setup Node.js, install pnpm, and install project dependencies'
 
 inputs:
+  # 使用する pnpm のバージョン
   pnpm-version:
     description: 'The version of pnpm to install'
     required: false
     default: 'lts/*'
+
+  # 使用する Node.js のバージョン
   node-version:
     description: 'The version of Node.js to use'
     required: false
     default: 'lts/*'
+
+  # CI/CD で Husky のフックを無効にするかどうか
   husky:
     description: 'Whether to disable Husky hooks during CI/CD'
     required: false
@@ -18,21 +23,24 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    # pnpm のインストール
     - name: Install pnpm
       id: install-pnpm
       uses: pnpm/action-setup@v4
       with:
-        version: ${{ inputs.pnpm-version }}
+        version: ${{ inputs.pnpm-version }} # 入力された pnpm のバージョンを使用
 
+    # Node.js のバージョンを設定
     - name: Set Node.js version to ${{ inputs.node-version }}
       id: setup-node
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ inputs.node-version }}
-        cache: 'pnpm'
+        node-version: ${{ inputs.node-version }} # 入力された Node.js のバージョンを使用
+        cache: 'pnpm' # pnpm 用のキャッシュを有効化
 
+    # プロジェクトの依存関係をインストール
     - name: Install dependencies
       shell: bash
-      run: pnpm install
+      run: pnpm install # pnpm を使って依存関係をインストール
       env:
-        HUSKY: ${{ inputs.husky }}
+        HUSKY: ${{ inputs.husky }} # Husky のフックを無効にするための環境変数を設定
