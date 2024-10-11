@@ -53,8 +53,8 @@ jobs:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
 
-      # Vitest を使ってユニットテストを実行し、カバレッジを取得
-      - name: Run Vitest and coverage
+      # Vitest を使ってユニットテストを実行
+      - name: Run Vitest
         run: pnpm ci:test
         env:
           CI: true # CI 環境用に設定
