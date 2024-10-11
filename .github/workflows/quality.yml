@@ -1,6 +1,7 @@
 name: Quality Check
 
 on:
+  # プルリクエストが「main」または「develop」ブランチに対して開かれたり、追加でコミットされたときに実行
   pull_request:
     branches:
       - main
@@ -8,108 +9,109 @@ on:
     types:
       - opened
       - synchronize
+  # 手動でワークフローを実行する場合のトリガー
   workflow_dispatch:
 
 env:
+  # Node.js と pnpm のバージョン設定
   NODE_VERSION: 20.17.0
   PNPM_VERSION: 9
-  PACKAGE_MANAGER: pnpm
 
 jobs:
-  type-check:
+  # TypeScript の型チェックを行うジョブ
+  typecheck:
+    name: 'TypeScript Type Check'
     runs-on: ubuntu-latest
     steps:
+      # ソースコードをチェックアウト（GitHub Actions がリポジトリのコードを取得）
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Install ${{ env.PACKAGE_MANAGER }}
-        uses: pnpm/action-setup@v4
+      # Node.js と依存関係をインストール
+      - name: Setup Node.js and install dependencies
+        uses: ./.github/actions/install
         with:
-          version: ${{ env.PNPM_VERSION }}
+          pnpm-version: ${{ env.PNPM_VERSION }} # 環境変数で設定した pnpm のバージョンを使用
+          node-version: ${{ env.NODE_VERSION }} # 環境変数で設定した Node.js のバージョンを使用
 
-      - name: Set Node.js version to ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: ${{ env.PACKAGE_MANAGER }}
-
-      - name: Install dependencies
-        run: ${{ env.PACKAGE_MANAGER }} install
-
+      # TypeScript の型チェックを実行
       - name: Run TypeScript type check
-        run: ${{ env.PACKAGE_MANAGER }} run lint:ts
+        run: pnpm ci:typecheck
 
+  # ユニットテストを実行するジョブ
   test:
+    name: 'Run Unit Tests'
     runs-on: ubuntu-latest
+    needs: typecheck # TypeScript の型チェックが成功した後に実行
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Install ${{ env.PACKAGE_MANAGER }}
-        uses: pnpm/action-setup@v4
+      - name: Setup Node.js and install dependencies
+        uses: ./.github/actions/install
         with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Set Node.js version to ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
-        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
-          cache: ${{ env.PACKAGE_MANAGER }}
 
-      - name: Install dependencies
-        run: ${{ env.PACKAGE_MANAGER }} install
-
-      - name: Run Vitest and coverage
-        run: ${{ env.PACKAGE_MANAGER }} test:coverage
+      # Vitest を使ってユニットテストを実行
+      - name: Run Vitest
+        run: pnpm ci:test
         env:
-          CI: true
+          CI: true # CI 環境用に設定
 
-  lint:
+  # コードスタイルチェックを行うジョブ
+  biome:
+    name: 'Biome Code Style Check'
     runs-on: ubuntu-latest
+    needs: typecheck # 型チェックが成功した後に実行
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Install ${{ env.PACKAGE_MANAGER }}
-        uses: pnpm/action-setup@v4
+      - name: Setup Node.js and install dependencies
+        uses: ./.github/actions/install
         with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Set Node.js version to ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
-        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
-          cache: ${{ env.PACKAGE_MANAGER }}
 
-      - name: Install dependencies
-        run: ${{ env.PACKAGE_MANAGER }} install
-
+      # Biome（コードフォーマット & スタイルチェックツール）を実行
       - name: Run Biome check
-        run: ${{ env.PACKAGE_MANAGER }} lint
+        run: pnpm ci:biome
 
-      - name: Run Prettier check
-        run: ${{ env.PACKAGE_MANAGER }} format:yaml:ci
-
-  build:
+  # Prettier を使ってコードの整形を確認するジョブ
+  prettier:
+    name: 'Prettier Formatting Check'
     runs-on: ubuntu-latest
-    needs: [type-check, test, lint]
+    needs: typecheck # 型チェックが成功した後に実行
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Install ${{ env.PACKAGE_MANAGER }}
-        uses: pnpm/action-setup@v4
+      - name: Setup Node.js and install dependencies
+        uses: ./.github/actions/install
         with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Set Node.js version to ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
-        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
-          cache: ${{ env.PACKAGE_MANAGER }}
 
-      - name: Install dependencies
-        run: ${{ env.PACKAGE_MANAGER }} install
+      # Prettier を使ってコードのフォーマットを確認
+      - name: Run Prettier check
+        run: pnpm ci:prettier
 
+  # プロジェクトのビルドを行うジョブ
+  build:
+    name: 'Build the Project'
+    runs-on: ubuntu-latest
+    needs: [typecheck, test, biome, prettier] # 型チェック、テスト、コードスタイル、整形が成功した後に実行
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and install dependencies
+        uses: ./.github/actions/install
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+
+      # プロジェクトのビルドを実行
       - name: Run Build
-        run: ${{ env.PACKAGE_MANAGER }} build
+        run: pnpm build
